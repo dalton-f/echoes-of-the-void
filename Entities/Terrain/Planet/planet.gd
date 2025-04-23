@@ -2,23 +2,13 @@
 @tool
 extends Node3D
 
+var rng = RandomNumberGenerator.new()
+
 # ----- SPHERE -----
+		
+var radius := rng.randf_range(10.0, 256.0)
 
-# export_groups allow us to organise many variables that we are making editable through the inspector
-@export_group("Sphere")
-# export_range allows us to define a minimum and maximum value without having to use maxi() or maxf()
-@export_range(1.0, 256.0, 1.0) var radius := 8.0:
-	# using set() in godot means that whenever the variable is changed, the code below will run
-	set(new_radius):
-		radius = new_radius
-		update_terrain()
-		update_water()
-
-# resolution of the sphere referes to how many vertices/subdivisions the sphere will have
-@export_range(4.0, 256.0, 4.0) var resolution := 64:
-	set(new_resolution):
-		resolution = new_resolution
-		update_terrain()
+var resolution := 64.0
 
 # ----- TERRAIN -----
 
@@ -47,17 +37,11 @@ extends Node3D
 
 # ----- WATER -----
 
+var water_level := rng.randf_range(0.2, 0.8)
+
+var water_resolution := 64.0
+
 @export_group("Water")
-
-@export_range(0.0, 1.0, 0.05) var water_level := 0.0:
-	set(new_water_level):
-		water_level = new_water_level
-		update_water()
-
-@export_range(4.0, 256.0, 4.0) var water_resolution := 64:
-	set(new_water_resolution):
-		water_resolution  = new_water_resolution
-		update_water()
 
 @export var water_material: Material:
 	set(new_water_material):
@@ -118,6 +102,10 @@ func update_terrain() -> void:
 	terrain.clear_surfaces()
 	# use the generated mesh arrays to convert out primitive sphere mesh into an array mesh
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
+	
+	# add the material to the planet after generating a random color
+	var albedo = Color(randf(), randf(), randf())
+	terrain_material.albedo_color = albedo
 	terrain.surface_set_material(0, terrain_material)
 
 func update_water() -> void:
@@ -138,7 +126,8 @@ func update_water() -> void:
 	# add the mesh
 	water.clear_surfaces()
 	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
-	water.surface_set_material(0, water_material)
-
-
 	
+	# add the material to the planet after generating a random color
+	var albedo = Color(randf(), randf(), randf())
+	water_material.albedo_color = albedo
+	water.surface_set_material(0, water_material)
