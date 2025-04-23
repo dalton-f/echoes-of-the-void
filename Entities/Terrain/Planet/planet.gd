@@ -2,6 +2,8 @@
 @tool
 extends Node3D
 
+@export var player_scene: PackedScene
+
 # ----- SPHERE -----
 		
 var radius := randf_range(600.0, 1000.0)
@@ -76,11 +78,13 @@ func randomize_colors() -> void:
 	$Water.mesh.surface_set_material(0, water_material_instance)
 	water_material = water_material_instance
 
-
 	var terrain_hue = fmod(water_hue + 0.5, 1.0)
 	var terrain_saturation = randf_range(0.5, 1.0)
 	var terrain_value = randf_range(0.5, 1.0)
 	var terrain_color = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value)
+	
+	print("Terrain color: ", terrain_color)
+	print("Water color: ", water_color)
 
 	# Create a new material instance for terrain
 	var terrain_material_instance = terrain_material.duplicate(true) as Material
@@ -132,15 +136,23 @@ func update_terrain() -> void:
 	# add the material to the planet after generating a random color
 	terrain.surface_set_material(0, terrain_material)
 	
-	# add a convex polygon collision shape to the planet
-	var convex_shape := ConvexPolygonShape3D.new()
-	var mesh_data : PackedVector3Array = terrain.get_mesh_arrays()[ArrayMesh.ARRAY_VERTEX]
+	# create a collision shape with create_trimesh_shape and attach it to a static body 3d as a child of the terrain
+	var collision = CollisionShape3D.new()
+	collision.shape = $Terrain.mesh.create_trimesh_shape()
+
+	var static_body = StaticBody3D.new()
+	static_body.add_child(collision)
 	
-	var collision_node := CollisionShape3D.new()
-	collision_node.shape = convex_shape
-	$Terrain.add_child(collision_node)
-
-
+	$Terrain.add_child(static_body)
+	
+	# temporary code to spawn the player really high up on the planet
+	var player_instance = player_scene.instantiate()
+	var start_position = global_position + Vector3(0, radius + height * 2, 0)
+	player_instance.position = start_position
+		
+	# add it as a child
+	add_child(player_instance)
+		
 func update_water() -> void:
 	if !water:
 		return
@@ -155,3 +167,11 @@ func update_water() -> void:
 	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
 	water.surface_set_material(0, water_material)
+	
+	var water_collision = CollisionShape3D.new()
+	water_collision.shape = $Water.mesh.create_trimesh_shape()
+
+	var water_static_body = StaticBody3D.new()
+	water_static_body.add_child(water_collision)
+	
+	$Water.add_child(water_static_body)
