@@ -2,6 +2,8 @@
 @tool
 extends Node3D
 
+# ----- SPHERE -----
+
 # export_groups allow us to organise many variables that we are making editable through the inspector
 @export_group("Sphere")
 # export_range allows us to define a minimum and maximum value without having to use maxi() or maxf()
@@ -17,6 +19,8 @@ extends Node3D
 	set(new_resolution):
 		resolution = new_resolution
 		update_terrain()
+
+# ----- TERRAIN -----
 
 @export_group("Terrain")
 
@@ -34,7 +38,19 @@ extends Node3D
 		update_terrain()
 		update_water()
 
+# ----- WATER -----
+
 @export_group("Water")
+
+@export_range(0.0, 1.0, 0.05) var water_level := 0.0:
+	set(new_water_level):
+		water_level = new_water_level
+		update_water()
+
+@export_range(4.0, 256.0, 4.0) var water_resolution := 64:
+	set(new_water_resolution):
+		water_resolution  = new_water_resolution
+		update_water()
 
 # we are creating a new ArrayMesh to ues as the terrain
 var terrain := ArrayMesh.new()
@@ -90,5 +106,18 @@ func update_terrain() -> void:
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 
 func update_water() -> void:
-	pass
+	if !water or water_level == 0.0:
+		$Water.visible = false
+		return
+		
+	$Water.visible = true
+	
+	# radius is the minimum point of the terrain, radius + height is the maximum point
+	var water_radius := lerpf(radius, radius + height, water_level)
+	
+	var mesh_arrays := create_sphere(water_radius, water_resolution)
+	
+	water.clear_surfaces()
+	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
+
 	
