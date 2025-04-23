@@ -9,11 +9,8 @@ points = PackedVector3Array(-0.125207, -0.532801, -0.480507, 0.0227831, 0.47607,
 
 [node name="Player" type="Node3D"]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
-shadow_enabled = true
-
 [node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.658345, 0)
 script = ExtResource("1_mv1ah")
 
 [node name="PlayerMesh" type="MeshInstance3D" parent="Player"]
@@ -26,12 +23,5 @@ shape = SubResource("ConvexPolygonShape3D_mv1ah")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.709254, -0.224)
 
 [node name="Camera3D" type="Camera3D" parent="Player/PlayerHead"]
-
-[node name="CSGBox3D" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.13492, 0)
-use_collision = true
-size = Vector3(200, 1, 200)
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.08473, 2.73243, -32.3934)
-size = Vector3(2, 4, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0, 0)
+fov = 75.75

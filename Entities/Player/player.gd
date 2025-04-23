@@ -1,14 +1,8 @@
-@tool
 extends CharacterBody3D
 
 const speed = 5.0
 const JUMP_VELOCITY = 4.8
 const SENSITIVITY = 0.004
-
-#bob variables
-const BOB_FREQ = 2.4
-const BOB_AMP = 0.08
-var t_bob = 0.0
 
 #fov variables
 const BASE_FOV = 75.0
@@ -19,7 +13,6 @@ var gravity = 9.8
 
 @onready var head = $PlayerHead
 @onready var camera = $PlayerHead/Camera3D
-
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -42,7 +35,7 @@ func _physics_process(delta):
 		velocity.y = JUMP_VELOCITY
 	
 	# Get the input direction and handle the movement/deceleration.
-	var input_dir = Input.get_vector("left", "right", "up", "down")
+	var input_dir = Input.get_vector("left", "right", "forward", "backward")
 	var direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()	
 	
 
@@ -59,22 +52,10 @@ func _physics_process(delta):
 	else:
 		velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0)
 		velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0)
-	
-	# Head bob
-	t_bob += delta * velocity.length() * float(is_on_floor())
-	camera.transform.origin = _headbob(t_bob)
-	
+		
 	# FOV
 	var velocity_clamped = clamp(velocity.length(), 0.5, speed * 2)
 	var target_fov = BASE_FOV + FOV_CHANGE * velocity_clamped
 	camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
 	
 	move_and_slide()
-
-
-func _headbob(time) -> Vector3:
-	var pos = Vector3.ZERO
-	pos.y = sin(time * BOB_FREQ) * BOB_AMP
-	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP
-	
-	return pos
