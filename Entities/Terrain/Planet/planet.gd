@@ -4,11 +4,13 @@ extends Node3D
 
 # ----- SPHERE -----
 		
-var radius := randf_range(10.0, 256.0)
+var radius := randf_range(600.0, 1000.0)
 
-var resolution := 64.0
+var resolution := 96.0
 
 # ----- TERRAIN -----
+
+var height := radius / 2 + 10
 
 @export_group("Terrain")
 
@@ -19,13 +21,6 @@ var resolution := 64.0
 		if noise:
 			noise.changed.connect(update_terrain)
 			
-@export_range(1.0, 256.0, 1.0) var height := 1.0:
-	set(new_height):
-		height = new_height
-		
-		update_terrain()
-		update_water()
-
 @export var terrain_material: Material:
 	set(new_terrain_material):
 		terrain_material = new_terrain_material
@@ -35,7 +30,7 @@ var resolution := 64.0
 
 # ----- WATER -----
 
-var water_level := randf_range(0.2, 0.8)
+var water_level := randf_range(0.2, 0.65)
 
 var water_resolution := 64.0
 
@@ -57,27 +52,41 @@ func _ready() -> void:
 	$Terrain.mesh = terrain
 	$Water.mesh = water
 	
-	# Generate a random hue for the water
-	var water_hue = randf()
-	var water_saturation = randf_range(0.5, 1.0) # Keep saturation relatively high
-	var water_value = randf_range(0.5, 1.0)
-	var water_color = Color.from_hsv(water_hue, water_saturation, water_value)
-	water_material.albedo_color = water_color
-
-	# Ensure the terrain hue is significantly different (e.g., opposite on the wheel)
-	var terrain_hue = fmod(water_hue + 0.5, 1.0) # Adding 0.5 puts it on the opposite side
-	var terrain_saturation = randf_range(0.5, 1.0)
-	var terrain_value = randf_range(0.5, 1.0)
-	var terrain_color = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value)
-	terrain_material.albedo_color = terrain_color
+	randomize_colors()
 	
 	# Debugging statements
 	
 	print("Planet radius: ", radius)
 	print("Water level: ", water_level)
+	print("Noise height: ", height)
 	
 	update_terrain()
 	update_water()
+
+func randomize_colors() -> void:
+	# generate a random hue for the water
+	var water_hue = randf()
+	var water_saturation = randf_range(0.2, 1.0) 
+	var water_value = randf_range(0.5, 1.0)
+	var water_color = Color.from_hsv(water_hue, water_saturation, water_value)
+
+	# create a new material instance for water
+	var water_material_instance = water_material.duplicate(true) as Material
+	water_material_instance.albedo_color = water_color
+	$Water.mesh.surface_set_material(0, water_material_instance)
+	water_material = water_material_instance
+
+
+	var terrain_hue = fmod(water_hue + 0.5, 1.0)
+	var terrain_saturation = randf_range(0.5, 1.0)
+	var terrain_value = randf_range(0.5, 1.0)
+	var terrain_color = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value)
+
+	# Create a new material instance for terrain
+	var terrain_material_instance = terrain_material.duplicate(true) as Material
+	terrain_material_instance.albedo_color = terrain_color
+	$Terrain.mesh.surface_set_material(0, terrain_material_instance)
+	terrain_material = terrain_material_instance # Update the exported variable
 
 func create_sphere(sphere_radius: float, sphere_resolution: int) -> Array:
 	# create a new primitive sphere mesh
@@ -122,6 +131,15 @@ func update_terrain() -> void:
 	
 	# add the material to the planet after generating a random color
 	terrain.surface_set_material(0, terrain_material)
+	
+	# add a convex polygon collision shape to the planet
+	var convex_shape := ConvexPolygonShape3D.new()
+	var mesh_data : PackedVector3Array = terrain.get_mesh_arrays()[ArrayMesh.ARRAY_VERTEX]
+	
+	var collision_node := CollisionShape3D.new()
+	collision_node.shape = convex_shape
+	$Terrain.add_child(collision_node)
+
 
 func update_water() -> void:
 	if !water:
