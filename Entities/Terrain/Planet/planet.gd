@@ -38,6 +38,13 @@ extends Node3D
 		update_terrain()
 		update_water()
 
+@export var terrain_material: Material:
+	set(new_terrain_material):
+		terrain_material = new_terrain_material
+		
+		if terrain.get_surface_count():
+			terrain.surface_set_material(0, terrain_material)
+
 # ----- WATER -----
 
 @export_group("Water")
@@ -51,6 +58,13 @@ extends Node3D
 	set(new_water_resolution):
 		water_resolution  = new_water_resolution
 		update_water()
+
+@export var water_material: Material:
+	set(new_water_material):
+		water_material = new_water_material
+		
+		if water.get_surface_count():
+			water.surface_set_material(0, water_material)
 
 # we are creating a new ArrayMesh to ues as the terrain
 var terrain := ArrayMesh.new()
@@ -104,20 +118,27 @@ func update_terrain() -> void:
 	terrain.clear_surfaces()
 	# use the generated mesh arrays to convert out primitive sphere mesh into an array mesh
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
+	terrain.surface_set_material(0, terrain_material)
 
 func update_water() -> void:
-	if !water or water_level == 0.0:
+	if !water:
+		return
+
+	if water_level == 0.0:
 		$Water.visible = false
 		return
-		
+
 	$Water.visible = true
 	
 	# radius is the minimum point of the terrain, radius + height is the maximum point
 	var water_radius := lerpf(radius, radius + height, water_level)
-	
+	# create another sphere mesh representing where the water would be
 	var mesh_arrays := create_sphere(water_radius, water_resolution)
 	
+	# add the mesh
 	water.clear_surfaces()
 	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
+	water.surface_set_material(0, water_material)
+
 
 	
