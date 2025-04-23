@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://bg7vsmlp1n731"]
+
+[ext_resource type="Script" uid="uid://cimaoj8i18pq7" path="res://Entities/Terrain/Space/space.gd" id="1_3tw7h"]
+[ext_resource type="PackedScene" uid="uid://bvyttoujnhn30" path="res://Entities/Terrain/Planet/planet.tscn" id="2_bq1at"]
+
+[node name="Space" type="Node3D"]
+script = ExtResource("1_3tw7h")
+planet_scene = ExtResource("2_bq1at")
