@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://bg7vsmlp1n731"]
+[gd_scene load_steps=3 format=3 uid="uid://bgmt8c38kcriq"]
 
 [ext_resource type="Script" uid="uid://cimaoj8i18pq7" path="res://Entities/Terrain/Space/space.gd" id="1_3tw7h"]
 [ext_resource type="PackedScene" uid="uid://bvyttoujnhn30" path="res://Entities/Terrain/Planet/planet.tscn" id="2_bq1at"]
@@ -6,3 +6,7 @@
 [node name="Space" type="Node3D"]
 script = ExtResource("1_3tw7h")
 planet_scene = ExtResource("2_bq1at")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
