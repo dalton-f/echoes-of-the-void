@@ -2,11 +2,9 @@
 @tool
 extends Node3D
 
-var rng = RandomNumberGenerator.new()
-
 # ----- SPHERE -----
 		
-var radius := rng.randf_range(10.0, 256.0)
+var radius := randf_range(10.0, 256.0)
 
 var resolution := 64.0
 
@@ -37,7 +35,7 @@ var resolution := 64.0
 
 # ----- WATER -----
 
-var water_level := rng.randf_range(0.2, 0.8)
+var water_level := randf_range(0.2, 0.8)
 
 var water_resolution := 64.0
 
@@ -59,13 +57,24 @@ func _ready() -> void:
 	$Terrain.mesh = terrain
 	$Water.mesh = water
 	
-	# add the material to the planet after generating a random color
-	var albedo = Color(randf(), randf(), randf())
-	water_material.albedo_color = albedo
+	# Generate a random hue for the water
+	var water_hue = randf()
+	var water_saturation = randf_range(0.5, 1.0) # Keep saturation relatively high
+	var water_value = randf_range(0.5, 1.0)
+	var water_color = Color.from_hsv(water_hue, water_saturation, water_value)
+	water_material.albedo_color = water_color
+
+	# Ensure the terrain hue is significantly different (e.g., opposite on the wheel)
+	var terrain_hue = fmod(water_hue + 0.5, 1.0) # Adding 0.5 puts it on the opposite side
+	var terrain_saturation = randf_range(0.5, 1.0)
+	var terrain_value = randf_range(0.5, 1.0)
+	var terrain_color = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value)
+	terrain_material.albedo_color = terrain_color
 	
-	# add the material to the planet after generating a random color
-	albedo = Color(randf(), randf(), randf())
-	terrain_material.albedo_color = albedo
+	# Debugging statements
+	
+	print("Planet radius: ", radius)
+	print("Water level: ", water_level)
 	
 	update_terrain()
 	update_water()
