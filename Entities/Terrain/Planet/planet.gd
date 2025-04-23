@@ -59,6 +59,14 @@ func _ready() -> void:
 	$Terrain.mesh = terrain
 	$Water.mesh = water
 	
+	# add the material to the planet after generating a random color
+	var albedo = Color(randf(), randf(), randf())
+	water_material.albedo_color = albedo
+	
+	# add the material to the planet after generating a random color
+	albedo = Color(randf(), randf(), randf())
+	terrain_material.albedo_color = albedo
+	
 	update_terrain()
 	update_water()
 
@@ -104,19 +112,11 @@ func update_terrain() -> void:
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
 	# add the material to the planet after generating a random color
-	var albedo = Color(randf(), randf(), randf())
-	terrain_material.albedo_color = albedo
 	terrain.surface_set_material(0, terrain_material)
 
 func update_water() -> void:
 	if !water:
 		return
-
-	if water_level == 0.0:
-		$Water.visible = false
-		return
-
-	$Water.visible = true
 	
 	# radius is the minimum point of the terrain, radius + height is the maximum point
 	var water_radius := lerpf(radius, radius + height, water_level)
@@ -127,7 +127,4 @@ func update_water() -> void:
 	water.clear_surfaces()
 	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
-	# add the material to the planet after generating a random color
-	var albedo = Color(randf(), randf(), randf())
-	water_material.albedo_color = albedo
 	water.surface_set_material(0, water_material)

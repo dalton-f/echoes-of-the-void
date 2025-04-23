@@ -11,5 +11,5 @@ config_version=5
 [application]
 
 config/name="Echoes of the Void"
-run/main_scene="uid://bvyttoujnhn30"
+run/main_scene="uid://bg7vsmlp1n731"
 config/features=PackedStringArray("4.4", "Forward Plus")
