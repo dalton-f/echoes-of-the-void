@@ -5,14 +5,14 @@ extends Node3D
 @export var player_scene: PackedScene
 
 # ----- SPHERE -----
-		
-var radius := randf_range(600.0, 1000.0)
 
-var resolution := 96.0
+@export var radius := 500
+
+var resolution := 32.0
 
 # ----- TERRAIN -----
 
-var height := radius / 2 + 10
+var height := radius / 2
 
 @export_group("Terrain")
 
@@ -22,8 +22,8 @@ var height := radius / 2 + 10
 		
 		if noise:
 			noise.changed.connect(update_terrain)
-			
-@export var terrain_material: Material:
+
+@export var terrain_material: ShaderMaterial:
 	set(new_terrain_material):
 		terrain_material = new_terrain_material
 		
@@ -32,13 +32,13 @@ var height := radius / 2 + 10
 
 # ----- WATER -----
 
-var water_level := randf_range(0.2, 0.65)
+var water_level := 0.0
 
-var water_resolution := 64.0
+var water_resolution := 16.0
 
 @export_group("Water")
 
-@export var water_material: Material:
+@export var water_material: ShaderMaterial:
 	set(new_water_material):
 		water_material = new_water_material
 		
@@ -54,43 +54,66 @@ func _ready() -> void:
 	$Terrain.mesh = terrain
 	$Water.mesh = water
 	
-	randomize_colors()
-	
-	# Debugging statements
-	
+	# Randomize noise parameters here if desired
+	noise.seed = randi() # Example: randomize the noise seed
+
+	# Randomize water level
+	water_level = randf_range(0.3, 0.6)
+
+	# Debugging statements (will now run on each scene load)
 	print("Planet radius: ", radius)
 	print("Water level: ", water_level)
 	print("Noise height: ", height)
+	print("Noise seed: ", noise.seed) # Debugging noise seed
 	
 	update_terrain()
 	update_water()
+	
+	randomize_colors()
 
 func randomize_colors() -> void:
 	# generate a random hue for the water
 	var water_hue = randf()
-	var water_saturation = randf_range(0.2, 1.0) 
-	var water_value = randf_range(0.5, 1.0)
-	var water_color = Color.from_hsv(water_hue, water_saturation, water_value)
-
-	# create a new material instance for water
-	var water_material_instance = water_material.duplicate(true) as Material
-	water_material_instance.albedo_color = water_color
-	$Water.mesh.surface_set_material(0, water_material_instance)
-	water_material = water_material_instance
-
-	var terrain_hue = fmod(water_hue + 0.5, 1.0)
-	var terrain_saturation = randf_range(0.5, 1.0)
-	var terrain_value = randf_range(0.5, 1.0)
-	var terrain_color = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value)
+	var water_saturation = randf_range(0.6, 1.0) 
+	var water_value_start = randf_range(0.6, 1.0)
 	
-	print("Terrain color: ", terrain_color)
-	print("Water color: ", water_color)
+	var water_color_1 = Color.from_hsv(water_hue, water_saturation, water_value_start)
+	var water_color_2 = Color.from_hsv(water_hue, water_saturation, max(0.0, water_value_start - 0.4)) # Slightly darker
+	var water_color_3 = Color.from_hsv(water_hue, water_saturation, max(0.0, water_value_start - 0.8)) # Even darker
 
-	# Create a new material instance for terrain
-	var terrain_material_instance = terrain_material.duplicate(true) as Material
-	terrain_material_instance.albedo_color = terrain_color
-	$Terrain.mesh.surface_set_material(0, terrain_material_instance)
-	terrain_material = terrain_material_instance # Update the exported variable
+	var gradient = Gradient.new()
+	
+	gradient.set_colors([water_color_1, water_color_2, water_color_3])
+	gradient.set_offsets([0.2, 0.4, 0.85])
+
+	
+	var gradient_texture = GradientTexture1D.new()
+	gradient_texture.gradient = gradient
+	
+	var water_material_instance = water_material.duplicate(true) as ShaderMaterial
+	
+	water_material_instance.set_shader_parameter("gradient", gradient_texture)
+	water_material = water_material_instance
+	
+	var terrain_hue = fmod(water_hue + 0.2, 1.0)
+	var terrain_saturation = randf_range(0.3, 1.0)
+	var terrain_value_start = randf_range(0.6, 1.0)
+	
+	var terrain_color_1 = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value_start - 0.55)
+	var terrain_color_3 = Color.from_hsv(terrain_hue, terrain_saturation, max(0.0, terrain_value_start))
+#
+	var terrain_gradient = Gradient.new()
+	
+	terrain_gradient.set_colors([terrain_color_1, terrain_color_3])
+	terrain_gradient.set_offsets([0.4, 0.85])
+	
+	var terrain_gradient_texture = GradientTexture1D.new()
+	terrain_gradient_texture.gradient = terrain_gradient
+	
+	var terrain_material_instance = terrain_material.duplicate(true) as ShaderMaterial
+	
+	terrain_material_instance.set_shader_parameter("gradient", terrain_gradient_texture)
+	terrain_material = terrain_material_instance
 
 func create_sphere(sphere_radius: float, sphere_resolution: int) -> Array:
 	# create a new primitive sphere mesh
@@ -107,25 +130,23 @@ func create_sphere(sphere_radius: float, sphere_resolution: int) -> Array:
 	return sphere.get_mesh_arrays()
 
 func get_noise(vertex: Vector3) -> float:
-	# essentially this code just gets a noise value for a vertex from a value between 0 and 1
-	return (noise.get_noise_3dv(vertex.normalized() * 2.0) + 1) / 2 * height
+	# First layer of noise
+	var noise_value = (noise.get_noise_3dv(vertex.normalized() * 2.0) + 1) / 2.0
+	
+	return noise_value * height
 
 # update_terrain is a function that takes no input and returns nothing
 func update_terrain() -> void:
 	if !terrain or !noise:
 		return
-	
+
 	var mesh_arrays := create_sphere(radius, resolution)
-	# extract the vertex array from the mesh arrays
 	var vertices: PackedVector3Array = mesh_arrays[ArrayMesh.ARRAY_VERTEX]
-		
-	# loop over each vertex to add noise
-	for i:int in vertices.size():
-		# select the current vertex
+
+	for i: int in vertices.size():
 		var vertex := vertices[i]
-		# add noise to the vertex
 		vertex += vertex.normalized() * get_noise(vertex)
-		# update the vertices array used to generate the mesh
+
 		vertices[i] = vertex
 		
 	# remove any pre-existing surfaces from the mesh	
@@ -144,14 +165,6 @@ func update_terrain() -> void:
 	static_body.add_child(collision)
 	
 	$Terrain.add_child(static_body)
-	
-	# temporary code to spawn the player really high up on the planet
-	var player_instance = player_scene.instantiate()
-	var start_position = global_position + Vector3(0, radius + height * 2, 0)
-	player_instance.position = start_position
-		
-	# add it as a child
-	add_child(player_instance)
 		
 func update_water() -> void:
 	if !water:
