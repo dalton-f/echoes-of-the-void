@@ -1,19 +1,18 @@
-# @tool allows us to use extra debugging options within a script
+# @tool allows the script to be executed within the editor which is helpful for debugging
 @tool
 extends Node3D
 
-@export var player_scene: PackedScene
+# Planet sphere base variables
+const planet_radius := 500.0
 
-# ----- SPHERE -----
+const planet_resolution := 32
 
-@export var radius := 500
+# Terrain variables
+const noise_height := planet_radius / 2
 
-var resolution := 32.0
+const TERRAIN_GRADIENT_OFFSETS = [0.5, 0.85]
 
-# ----- TERRAIN -----
-
-var height := radius / 2
-
+# @export is used to mark variables that should be editable in the inspector
 @export_group("Terrain")
 
 @export var noise := FastNoiseLite.new():
@@ -21,7 +20,7 @@ var height := radius / 2
 		noise = new_noise
 		
 		if noise:
-			noise.changed.connect(update_terrain)
+			noise.changed.connect(generate_terrain_mesh)
 
 @export var terrain_material: ShaderMaterial:
 	set(new_terrain_material):
@@ -30,11 +29,12 @@ var height := radius / 2
 		if terrain.get_surface_count():
 			terrain.surface_set_material(0, terrain_material)
 
-# ----- WATER -----
-
+# Water sphere variables
 var water_level := 0.0
 
-var water_resolution := 16.0
+var water_resolution := 16
+
+const WATER_GRADIENT_OFFSETS = [0.2, 0.4, 0.85]
 
 @export_group("Water")
 
@@ -45,146 +45,140 @@ var water_resolution := 16.0
 		if water.get_surface_count():
 			water.surface_set_material(0, water_material)
 
-# we are creating a new ArrayMesh to ues as the terrain
+# To generate the mesh shape, we use an ArrayMesh as we have more control over the vertices o create surfaces
 var terrain := ArrayMesh.new()
 var water := ArrayMesh.new()
 
-# when the script loads for the first time, assign the correspondng mesh to the mesh instance
+# _ready loads once when the node is loaded into the scene - this func takes no parameters and returns nothing
 func _ready() -> void:
-	$Terrain.mesh = terrain
-	$Water.mesh = water
+	prepare_meshes()
+	randomise_values()
 	
-	# Randomize noise parameters here if desired
-	noise.seed = randi() # Example: randomize the noise seed
+	print_debugging_statements()
 
-	# Randomize water level
-	water_level = randf_range(0.3, 0.6)
-
-	# Debugging statements (will now run on each scene load)
-	print("Planet radius: ", radius)
-	print("Water level: ", water_level)
-	print("Noise height: ", height)
-	print("Noise seed: ", noise.seed) # Debugging noise seed
-	
-	update_terrain()
-	update_water()
+	generate_terrain_mesh()
+	generate_water_mesh()
 	
 	randomize_colors()
+	
+# Set the corresponding ArrayMesh to each MeshInterface
+func prepare_meshes() -> void:
+	$Terrain/TerrainMesh.mesh = terrain
+	$Water/WaterMesh.mesh = water
 
+# Randomise some of the planet's properties by updating the noise seed and water level
+func randomise_values() -> void:
+	noise.seed = randi()
+	
+	water_level = randf_range(0.4, 0.7)
+
+func print_debugging_statements() -> void:
+	print("planet_radius: ", planet_radius)
+	print("water_level: ", water_level)
+	print("noise_height: ", noise_height)
+	print("noise.seed: ", noise.seed)
+	
 func randomize_colors() -> void:
-	# generate a random hue for the water
 	var water_hue = randf()
 	var water_saturation = randf_range(0.6, 1.0) 
 	var water_value_start = randf_range(0.6, 1.0)
 	
-	var water_color_1 = Color.from_hsv(water_hue, water_saturation, water_value_start)
-	var water_color_2 = Color.from_hsv(water_hue, water_saturation, max(0.0, water_value_start - 0.4)) # Slightly darker
-	var water_color_3 = Color.from_hsv(water_hue, water_saturation, max(0.0, water_value_start - 0.8)) # Even darker
+	var water_color_start = create_hsv_color(water_hue, water_saturation, water_value_start)
+	var water_color_mid = create_hsv_color(water_hue, water_saturation, water_value_start, -0.4)
+	var water_color_end = create_hsv_color(water_hue, water_saturation, water_value_start, -0.6)
+	
+	var water_gradient_texture = generate_gradient_texture([water_color_start, water_color_mid, water_color_end], WATER_GRADIENT_OFFSETS)
 
-	var gradient = Gradient.new()
-	
-	gradient.set_colors([water_color_1, water_color_2, water_color_3])
-	gradient.set_offsets([0.2, 0.4, 0.85])
-
-	
-	var gradient_texture = GradientTexture1D.new()
-	gradient_texture.gradient = gradient
-	
+	# Duplicate the shader material so each instance of the planet has different colors
 	var water_material_instance = water_material.duplicate(true) as ShaderMaterial
-	
-	water_material_instance.set_shader_parameter("gradient", gradient_texture)
+	# Apply the new gradient texture
+	water_material_instance.set_shader_parameter("gradient", water_gradient_texture)
 	water_material = water_material_instance
 	
-	var terrain_hue = fmod(water_hue + 0.2, 1.0)
-	var terrain_saturation = randf_range(0.3, 1.0)
+	# Ensure that the terrain hue is dissimilar enough from the water
+	var terrain_hue = fmod(water_hue + 0.3, 1.0)
+	var terrain_saturation = randf_range(0.5, 1.0)
 	var terrain_value_start = randf_range(0.6, 1.0)
 	
-	var terrain_color_1 = Color.from_hsv(terrain_hue, terrain_saturation, terrain_value_start - 0.55)
-	var terrain_color_3 = Color.from_hsv(terrain_hue, terrain_saturation, max(0.0, terrain_value_start))
+	var terrain_color_start = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, -0.65)
+	var terrain_color_end = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, 0.2)
 #
-	var terrain_gradient = Gradient.new()
-	
-	terrain_gradient.set_colors([terrain_color_1, terrain_color_3])
-	terrain_gradient.set_offsets([0.4, 0.85])
-	
-	var terrain_gradient_texture = GradientTexture1D.new()
-	terrain_gradient_texture.gradient = terrain_gradient
-	
+	var terrain_gradient_texture = generate_gradient_texture([terrain_color_start, terrain_color_end], TERRAIN_GRADIENT_OFFSETS)
+
 	var terrain_material_instance = terrain_material.duplicate(true) as ShaderMaterial
 	
 	terrain_material_instance.set_shader_parameter("gradient", terrain_gradient_texture)
 	terrain_material = terrain_material_instance
 
+func create_hsv_color(hue: float, saturation: float, value_start: float, value_offset: float = 0.0) -> Color:
+	return Color.from_hsv(hue, saturation, max(0.0, value_start + value_offset))
+
+func generate_gradient_texture(colors: Array, offsets: Array) -> GradientTexture1D:
+	var gradient = Gradient.new()
+	
+	gradient.set_colors(colors)
+	gradient.set_offsets(offsets)
+	
+	var gradient_texture = GradientTexture1D.new()
+	gradient_texture.gradient = gradient
+	
+	return gradient_texture
+	
+# Generates a basic Godot 3d sphere mesh given a radius and resolution to control the mesh subdivision detail
 func create_sphere(sphere_radius: float, sphere_resolution: int) -> Array:
-	# create a new primitive sphere mesh
 	var sphere := SphereMesh.new()
-	# set the size according to our default values
 	sphere.radius = sphere_radius
 	sphere.height = sphere_radius * 2
 	
-	# set the radial segments and rings based on our selected resolution to control the detail
 	sphere.radial_segments = sphere_resolution * 2
 	sphere.rings = sphere_resolution
 	
-	# return the mesh arrays used to make up the surface of this mesh
 	return sphere.get_mesh_arrays()
 
+# Return the noise value for each vertex remapped to a value between 0.0 and 1.0
 func get_noise(vertex: Vector3) -> float:
-	# First layer of noise
 	var noise_value = (noise.get_noise_3dv(vertex.normalized() * 2.0) + 1) / 2.0
 	
-	return noise_value * height
+	return noise_value * noise_height
 
-# update_terrain is a function that takes no input and returns nothing
-func update_terrain() -> void:
+func generate_terrain_mesh() -> void:
 	if !terrain or !noise:
 		return
-
-	var mesh_arrays := create_sphere(radius, resolution)
+		
+	# Create a basic sphere given the planet radius and resolution
+	var mesh_arrays := create_sphere(planet_radius, planet_resolution)
+	# Extract the vertices data
 	var vertices: PackedVector3Array = mesh_arrays[ArrayMesh.ARRAY_VERTEX]
 
+	# Loop over each vertex and apply noise to it before updating the array
 	for i: int in vertices.size():
 		var vertex := vertices[i]
 		vertex += vertex.normalized() * get_noise(vertex)
 
 		vertices[i] = vertex
-		
-	# remove any pre-existing surfaces from the mesh	
+	
+	# Clear any pre-existing ArrayMesh surfaces
 	terrain.clear_surfaces()
-	# use the generated mesh arrays to convert out primitive sphere mesh into an array mesh
+	# Generate the new surface using triangles
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
-	# add the material to the planet after generating a random color
+	# Add the shader material
 	terrain.surface_set_material(0, terrain_material)
 	
-	# create a collision shape with create_trimesh_shape and attach it to a static body 3d as a child of the terrain
-	var collision = CollisionShape3D.new()
-	collision.shape = $Terrain.mesh.create_trimesh_shape()
-
-	var static_body = StaticBody3D.new()
-	static_body.add_child(collision)
-	
-	$Terrain.add_child(static_body)
+	# Update the collision shape to match the new mesh
+	$Terrain/TerrainCollisionShape.shape = $Terrain/TerrainMesh.mesh.create_trimesh_shape()
 		
-func update_water() -> void:
+func generate_water_mesh() -> void:
 	if !water:
 		return
 	
-	# radius is the minimum point of the terrain, radius + height is the maximum point
-	var water_radius := lerpf(radius, radius + height, water_level)
-	# create another sphere mesh representing where the water would be
+	# Generate the water_radius by using the water_level to generate a result between the minimum and maximum height of the planet
+	var water_radius := lerpf(planet_radius, planet_radius + noise_height, water_level)
 	var mesh_arrays := create_sphere(water_radius, water_resolution)
 	
-	# add the mesh
 	water.clear_surfaces()
 	water.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
 	water.surface_set_material(0, water_material)
 	
-	var water_collision = CollisionShape3D.new()
-	water_collision.shape = $Water.mesh.create_trimesh_shape()
-
-	var water_static_body = StaticBody3D.new()
-	water_static_body.add_child(water_collision)
-	
-	$Water.add_child(water_static_body)
+	$Water/WaterCollisionShape.shape = 	$Water/WaterMesh.mesh.create_trimesh_shape()
