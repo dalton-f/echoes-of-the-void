@@ -1,11 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://bgmt8c38kcriq"]
+[gd_scene load_steps=7 format=3 uid="uid://bgmt8c38kcriq"]
 
-[ext_resource type="Script" uid="uid://cimaoj8i18pq7" path="res://Entities/Terrain/Space/space.gd" id="1_3tw7h"]
-[ext_resource type="PackedScene" uid="uid://bvyttoujnhn30" path="res://Entities/Terrain/Planet/planet.tscn" id="2_bq1at"]
+[ext_resource type="Script" uid="uid://cimaoj8i18pq7" path="res://Entities/Terrain/Space/Space.gd" id="1_3tw7h"]
+[ext_resource type="PackedScene" uid="uid://bvyttoujnhn30" path="res://Entities/Terrain/Planet/Planet.tscn" id="2_bq1at"]
+[ext_resource type="Texture2D" uid="uid://b7k85c87ephro" path="res://Assets/Textures/panorama_image.png" id="3_l5b3e"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_ubk7a"]
+panorama = ExtResource("3_l5b3e")
+
+[sub_resource type="Sky" id="Sky_l5b3e"]
+sky_material = SubResource("PanoramaSkyMaterial_ubk7a")
+
+[sub_resource type="Environment" id="Environment_ubk7a"]
+background_mode = 2
+sky = SubResource("Sky_l5b3e")
 
 [node name="Space" type="Node3D"]
 script = ExtResource("1_3tw7h")
 planet_scene = ExtResource("2_bq1at")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ubk7a")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
