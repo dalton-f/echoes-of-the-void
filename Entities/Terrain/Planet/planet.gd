@@ -3,14 +3,14 @@
 extends Node3D
 
 # Planet sphere base variables
-const planet_radius := 500.0
+const planet_radius := 250.0
 
 const planet_resolution := 32
 
 # Terrain variables
 const noise_height := planet_radius / 2
 
-const TERRAIN_GRADIENT_OFFSETS = [0.5, 0.85]
+const TERRAIN_GRADIENT_OFFSETS = [0.3, 0.85]
 
 # @export is used to mark variables that should be editable in the inspector
 @export_group("Terrain")
@@ -60,7 +60,7 @@ func _ready() -> void:
 	generate_water_mesh()
 	
 	randomize_colors()
-	
+
 # Set the corresponding ArrayMesh to each MeshInterface
 func prepare_meshes() -> void:
 	$Terrain/TerrainMesh.mesh = terrain
@@ -70,7 +70,7 @@ func prepare_meshes() -> void:
 func randomise_values() -> void:
 	noise.seed = randi()
 	
-	water_level = randf_range(0.4, 0.7)
+	water_level = randf_range(0.2, 0.7)
 
 func print_debugging_statements() -> void:
 	print("planet_radius: ", planet_radius)
@@ -100,8 +100,8 @@ func randomize_colors() -> void:
 	var terrain_saturation = randf_range(0.5, 1.0)
 	var terrain_value_start = randf_range(0.6, 1.0)
 	
-	var terrain_color_start = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, -0.65)
-	var terrain_color_end = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, 0.2)
+	var terrain_color_start = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, -0.6)
+	var terrain_color_end = create_hsv_color(terrain_hue, terrain_saturation, terrain_value_start, 0.4)
 #
 	var terrain_gradient_texture = generate_gradient_texture([terrain_color_start, terrain_color_end], TERRAIN_GRADIENT_OFFSETS)
 
@@ -162,6 +162,7 @@ func generate_terrain_mesh() -> void:
 	# Generate the new surface using triangles
 	terrain.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh_arrays)
 	
+
 	# Add the shader material
 	terrain.surface_set_material(0, terrain_material)
 	
