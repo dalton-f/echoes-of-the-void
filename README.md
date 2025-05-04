@@ -1,6 +1,6 @@
 # Echoes of the Void
 
-**Made in 2 weeks with Godot for a Game Jam**
+**Initially made in 2 weeks with Godot for a simulated game jam**
 
 ### Description
 

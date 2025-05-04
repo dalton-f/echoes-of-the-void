@@ -11,8 +11,12 @@ config_version=5
 [application]
 
 config/name="Echoes of the Void"
-run/main_scene="uid://ft0rjb1wmt32"
+run/main_scene="uid://c8q4hqrsj7mue"
 config/features=PackedStringArray("4.4", "Forward Plus")
+
+[gui]
+
+theme/custom_font="uid://dqv72q4lo0rw0"
 
 [input]
 

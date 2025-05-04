@@ -1,0 +1,98 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8q4hqrsj7mue"]
+
+[ext_resource type="Script" uid="uid://c784iaxniyomn" path="res://Entities/UI/MainMenu.gd" id="1_7g0n8"]
+[ext_resource type="Texture2D" uid="uid://b7k85c87ephro" path="res://Assets/Textures/panorama_image.png" id="2_dv6r4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dv6r4"]
+bg_color = Color(0.154876, 0.154876, 0.154876, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 32.0
+expand_margin_top = 8.0
+expand_margin_right = 32.0
+expand_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7g0n8"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+expand_margin_left = 32.0
+expand_margin_top = 8.0
+expand_margin_right = 32.0
+expand_margin_bottom = 8.0
+anti_aliasing_size = 0.01
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7g0n8")
+
+[node name="BackgroundTexture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3264.0
+offset_top = -1836.0
+offset_right = 3264.0
+offset_bottom = 1836.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_dv6r4")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 64
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 64
+text = "Echoes of the Void"
+fit_content = true
+autowrap_mode = 0
+
+[node name="Play" type="Button" parent="CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+theme_override_styles/focus = SubResource("StyleBoxFlat_dv6r4")
+theme_override_styles/hover = SubResource("StyleBoxFlat_dv6r4")
+theme_override_styles/normal = SubResource("StyleBoxFlat_7g0n8")
+text = "PLAY
+"
+
+[node name="Quit" type="Button" parent="CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+theme_override_styles/focus = SubResource("StyleBoxFlat_dv6r4")
+theme_override_styles/hover = SubResource("StyleBoxFlat_dv6r4")
+theme_override_styles/normal = SubResource("StyleBoxFlat_7g0n8")
+text = "QUIT
+"
