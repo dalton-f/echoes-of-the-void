@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://clabveiw6bvnn"]
+
+[ext_resource type="AudioStream" uid="uid://0vw5aub0b80y" path="res://Assets/Audio/8-bit-space-music.mp3" id="1_70lft"]
+
+[node name="MusicPlayer" type="AudioStreamPlayer"]
+stream = ExtResource("1_70lft")
+autoplay = true
