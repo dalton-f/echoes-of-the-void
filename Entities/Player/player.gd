@@ -1,21 +1,36 @@
 extends CharacterBody3D
 
 const SPEED = 10.0
-const JUMP_VELOCITY = 10.0
+const JUMP_VELOCITY = 20.0
 const SENSITIVITY = 0.004
 const ROTATION_SPEED = 50.0
 
 var gravity_direction = Vector3.DOWN
 
+var ship_ref = CharacterBody3D
+
 @onready var mesh = $PlayerMesh
 @onready var head = $PlayerHead
 @onready var camera = $PlayerHead/Camera3D
 
-# Hides the cursor
-func _ready():
+func _ready() -> void:
+	ship_ref = get_tree().get_root().get_node("Space/Ship")
+
+func _process(_delta):
+	if GameManager.ship_state == GameManager.ShipState.INSIDE_SHIP:
+		# Ensure the player ends up at the same position of the ship after exiting
+		position = ship_ref.position
+		visible = false
+		$PlayerCollision.disabled = true
+		
+		return
+	
+	# Set the correct camera to current and enable collisions
+	camera.make_current()
+	$PlayerCollision.disabled = false
+
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-func _process(_delta):
 	# Get gravity from the default physics engine (and any Area3D nodes)
 	gravity_direction = get_gravity().normalized()
 	
@@ -24,6 +39,9 @@ func _process(_delta):
 	
 # Handles mouse movement
 func _unhandled_input(event):
+	if GameManager.ship_state == GameManager.ShipState.INSIDE_SHIP:
+		return
+		
 	if event is InputEventMouseMotion:
 		head.rotate_y(-event.relative.x * SENSITIVITY)
 		camera.rotate_x(-event.relative.y * SENSITIVITY)
@@ -31,6 +49,9 @@ func _unhandled_input(event):
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60))
 
 func _physics_process(delta):
+	if GameManager.ship_state == GameManager.ShipState.INSIDE_SHIP:
+		return
+		
 	var direction = _get_oriented_input()
 	
 	# If we are grounded, move in the correct direction

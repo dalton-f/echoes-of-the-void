@@ -12,6 +12,9 @@ const noise_height := planet_radius / 2
 
 const TERRAIN_GRADIENT_OFFSETS = [0.3, 0.85]
 
+# Planet gravity variables
+@onready var gravitational_influence_sphere = $Gravitational_Influence
+
 # @export is used to mark variables that should be editable in the inspector
 @export_group("Terrain")
 
@@ -45,6 +48,7 @@ const WATER_GRADIENT_OFFSETS = [0.2, 0.4, 0.85]
 		if water.get_surface_count():
 			water.surface_set_material(0, water_material)
 
+
 # To generate the mesh shape, we use an ArrayMesh as we have more control over the vertices o create surfaces
 var terrain := ArrayMesh.new()
 var water := ArrayMesh.new()
@@ -71,12 +75,15 @@ func randomise_values() -> void:
 	noise.seed = randi()
 	
 	water_level = randf_range(0.2, 0.7)
+	
+	gravitational_influence_sphere.gravity = randf_range(3.0, 12.0)
 
 func print_debugging_statements() -> void:
 	print("planet_radius: ", planet_radius)
 	print("water_level: ", water_level)
 	print("noise_height: ", noise_height)
 	print("noise.seed: ", noise.seed)
+	print("gravity: ", gravitational_influence_sphere.gravity)
 	
 func randomize_colors() -> void:
 	var water_hue = randf()

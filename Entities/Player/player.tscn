@@ -28,3 +28,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.709244, -0.223999)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.198109, 0.033493, 0.0324097)
 current = true
 fov = 75.75
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 242.0
+offset_bottom = 33.0
+text = "Press E to swap to ship"
