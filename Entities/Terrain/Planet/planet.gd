@@ -58,7 +58,7 @@ func _ready() -> void:
 	prepare_meshes()
 	randomise_values()
 	
-	print_debugging_statements()
+	#print_debugging_statements()
 
 	generate_terrain_mesh()
 	generate_water_mesh()

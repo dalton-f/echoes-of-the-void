@@ -1,12 +1,14 @@
-[gd_scene load_steps=17 format=3 uid="uid://bgmt8c38kcriq"]
+[gd_scene load_steps=19 format=3 uid="uid://bgmt8c38kcriq"]
 
 [ext_resource type="Script" uid="uid://cimaoj8i18pq7" path="res://Entities/Terrain/Space/Space.gd" id="1_3tw7h"]
 [ext_resource type="PackedScene" uid="uid://bvyttoujnhn30" path="res://Entities/Terrain/Planet/Planet.tscn" id="2_bq1at"]
 [ext_resource type="PackedScene" uid="uid://ft0rjb1wmt32" path="res://Entities/Player/Player.tscn" id="2_flgjf"]
 [ext_resource type="Texture2D" uid="uid://b7k85c87ephro" path="res://Assets/Textures/panorama_image.png" id="3_l5b3e"]
+[ext_resource type="PackedScene" uid="uid://cnbloc7ih54bq" path="res://Entities/Terrain/Asteroids/Asteroids.tscn" id="3_wdeym"]
 [ext_resource type="PackedScene" uid="uid://crth7flx81m45" path="res://Entities/Player/Ship/Ship.tscn" id="5_fewwj"]
+[ext_resource type="PackedScene" uid="uid://xalr4ual0yab" path="res://Entities/UI/PauseScreen/Pause.tscn" id="6_wdeym"]
 
-[sub_resource type="Shader" id="Shader_wdeym"]
+[sub_resource type="Shader" id="Shader_13sys"]
 code = "shader_type spatial;
 render_mode world_vertex_coords;
 
@@ -28,22 +30,22 @@ void fragment() {
 	ALBEDO = texture(gradient, vec2(color_uv, 0.0)).rgb;
 }"
 
-[sub_resource type="Gradient" id="Gradient_13sys"]
+[sub_resource type="Gradient" id="Gradient_jc5w5"]
 offsets = PackedFloat32Array(0.3, 0.85)
-colors = PackedColorArray(0.00864944, 0.0193766, 0.00484273, 1, 0.455036, 1.01938, 0.25477, 1)
+colors = PackedColorArray(0.179754, 0.134091, 0.0855493, 1, 1.17975, 0.88006, 0.561473, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_jc5w5"]
-gradient = SubResource("Gradient_13sys")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_tabs0"]
+gradient = SubResource("Gradient_jc5w5")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tabs0"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qghev"]
 render_priority = 0
-shader = SubResource("Shader_wdeym")
+shader = SubResource("Shader_13sys")
 shader_parameter/roughness = 0.6
 shader_parameter/radius = 250.0
 shader_parameter/height = 175.0
-shader_parameter/gradient = SubResource("GradientTexture1D_jc5w5")
+shader_parameter/gradient = SubResource("GradientTexture1D_tabs0")
 
-[sub_resource type="Shader" id="Shader_qghev"]
+[sub_resource type="Shader" id="Shader_pbbeg"]
 code = "shader_type spatial;
 
 uniform float radius = 20.0;
@@ -64,19 +66,19 @@ void fragment() {
 	ALBEDO = texture(gradient, vec2(color_uv, 0.0)).rgb;
 }"
 
-[sub_resource type="Gradient" id="Gradient_pbbeg"]
+[sub_resource type="Gradient" id="Gradient_pkwlp"]
 offsets = PackedFloat32Array(0.2, 0.4, 0.85)
-colors = PackedColorArray(0.961313, 0.125256, 0.177025, 1, 0.561313, 0.0731371, 0.103366, 1, 0.361313, 0.0470778, 0.0665356, 1)
+colors = PackedColorArray(0.553602, 0.14857, 0.714828, 1, 0.24382, 0.065434, 0.314828, 1, 0.0889294, 0.023866, 0.114828, 1)
 
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_pkwlp"]
-gradient = SubResource("Gradient_pbbeg")
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_npony"]
+gradient = SubResource("Gradient_pkwlp")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_npony"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_djwwt"]
 render_priority = 0
-shader = SubResource("Shader_qghev")
+shader = SubResource("Shader_pbbeg")
 shader_parameter/radius = 20.0
 shader_parameter/level = 100.0
-shader_parameter/gradient = SubResource("GradientTexture1D_pkwlp")
+shader_parameter/gradient = SubResource("GradientTexture1D_npony")
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_ubk7a"]
 panorama = ExtResource("3_l5b3e")
@@ -90,14 +92,18 @@ sky = SubResource("Sky_l5b3e")
 
 [node name="Space" type="Node3D"]
 script = ExtResource("1_3tw7h")
+planet_scene = ExtResource("2_bq1at")
+asteroid_cluster = ExtResource("3_wdeym")
+
+[node name="Pause" parent="." instance=ExtResource("6_wdeym")]
 
 [node name="Player" parent="." instance=ExtResource("2_flgjf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 340.552, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 356.979, 0)
 up_direction = Vector3(-0.0335183, 0.996186, 0.0805627)
 
 [node name="Planet" parent="." instance=ExtResource("2_bq1at")]
-terrain_material = SubResource("ShaderMaterial_tabs0")
-water_material = SubResource("ShaderMaterial_npony")
+terrain_material = SubResource("ShaderMaterial_qghev")
+water_material = SubResource("ShaderMaterial_djwwt")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ubk7a")
@@ -107,4 +113,4 @@ transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -
 light_energy = 1.5
 
 [node name="Ship" parent="." instance=ExtResource("5_fewwj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.9888, 325.099, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -45.9888, 365.362, 0)

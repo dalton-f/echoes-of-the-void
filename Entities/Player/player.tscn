@@ -27,7 +27,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.709244, -0.223999)
 [node name="Camera3D" type="Camera3D" parent="PlayerHead"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.198109, 0.033493, 0.0324097)
 current = true
-fov = 75.75
+far = 1e+06
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3

@@ -19,7 +19,9 @@ func _ready() -> void:
 func _process(_delta):
 	if GameManager.ship_state == GameManager.ShipState.INSIDE_SHIP:
 		# Ensure the player ends up at the same position of the ship after exiting
-		position = ship_ref.position
+		position.x = ship_ref.position.x * 1.05
+		position.z = ship_ref.position.z * 1.05
+		position.y = ship_ref.position.y
 		visible = false
 		$PlayerCollision.disabled = true
 		
