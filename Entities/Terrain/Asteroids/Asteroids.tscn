@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://cnbloc7ih54bq"]
+
+[ext_resource type="Script" uid="uid://j2ctgplxsmhd" path="res://Entities/Terrain/Asteroids/Asteroids.gd" id="1_ahbit"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ahbit"]
+seed = -2108510191
+frequency = 0.5
+
+[node name="Asteroids" type="Node3D"]
+script = ExtResource("1_ahbit")
+asteroid_noise_height = 100.0
+noise = SubResource("FastNoiseLite_ahbit")

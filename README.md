@@ -4,11 +4,11 @@
 
 ### Description
 
-Echoes of the Void is a 3D space exploration detective game.  You play as a detective venturing into the vastness of space to solve a mysterious case.  Explore abandoned planets, gather clues, analyse lifeforms, and unravel the secrets of what happened.  The game was created in two weeks for a game jam, with the theme "Going Deeper".
+Echoes of the Void is a demo of a 3D space exploration detective game.  The idea stemmed from the theme "Going Deeper" where you would play as a detective venturing into the vastness of space to explore abandoned planets, gather clues, and analyse lifeforms.  
 
 ### Features
 
-* **Exploration:** Navigate through space and discover various locations.
+* **Exploration:** Navigate through space and discover various planets and asteroid belts.
 
 * **Godot Engine:** Built using the open-source Godot game engine.
 
