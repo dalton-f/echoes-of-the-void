@@ -5,9 +5,11 @@ func _ready():
 	%Play.pressed.connect(play)
 	%Quit.pressed.connect(exit)
 
-# Load the main game scene
+# Load the main game scene after it has been loaded
 func play():
-	get_tree().change_scene_to_file("res://Entities/Terrain/Space/Space.tscn")
+	var loadingScreen = load("res://Entities/UI/LoadingScreen/LoadingScreen.tscn")
+	
+	get_tree().change_scene_to_packed(loadingScreen)
 
 # Quits the game	
 func exit():

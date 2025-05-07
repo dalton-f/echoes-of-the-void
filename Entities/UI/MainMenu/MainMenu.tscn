@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://c8q4hqrsj7mue"]
 
-[ext_resource type="Script" uid="uid://c784iaxniyomn" path="res://Entities/UI/MainMenu.gd" id="1_7g0n8"]
-[ext_resource type="Texture2D" uid="uid://b7k85c87ephro" path="res://Assets/Textures/panorama_image.png" id="2_dv6r4"]
+[ext_resource type="Script" uid="uid://c784iaxniyomn" path="res://Entities/UI/MainMenu/MainMenu.gd" id="1_ix86x"]
+[ext_resource type="Texture2D" uid="uid://b7k85c87ephro" path="res://Assets/Textures/panorama_image.png" id="2_gn4nv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dv6r4"]
 bg_color = Color(0.154876, 0.154876, 0.154876, 1)
@@ -41,20 +41,22 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_7g0n8")
+script = ExtResource("1_ix86x")
 
 [node name="BackgroundTexture" type="TextureRect" parent="."]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -3264.0
-offset_top = -1836.0
-offset_right = 3264.0
-offset_bottom = 1836.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -3840.0
+offset_top = -2160.0
+offset_right = 3840.0
+offset_bottom = 2160.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_dv6r4")
+texture = ExtResource("2_gn4nv")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
