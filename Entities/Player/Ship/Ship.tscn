@@ -28,7 +28,8 @@ points = PackedVector3Array(-0.393343, -0.0554977, -2.04921, -3.14921, -0.449206
 script = ExtResource("1_ctgfj")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.657667, -5.71194)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.89004, -5.93959)
+far = 100000.0
 
 [node name="InfraredFurtive" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_ctgfj")

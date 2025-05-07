@@ -1,9 +1,9 @@
 # https://github.com/RyanRemer/ship_controller/blob/main/ship_controller/player_v5.gd
 extends CharacterBody3D
 
-@export var max_speed = 75.0;
-@export var acceleration = 20.0;
-@export var rotation_speed = 5.0;
+@export var max_speed = 500.0;
+@export var acceleration = 300.0;
+@export var rotation_speed = 20.0;
 
 var gravity = 9.8;
 
@@ -29,24 +29,13 @@ func _process(delta):
 	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
 	$Camera3D.make_current()
 
-
-	# Rotate Player
 	var relative_mouse = _get_relative_mouse();
-	var new_basis = transform.basis;
-	basis = new_basis.rotated(basis.x, relative_mouse.y * rotation_speed * delta);
-	basis = new_basis.rotated(basis.y, -relative_mouse.x * rotation_speed * delta);
-	basis = new_basis.orthonormalized();
-	transform.basis = new_basis;
-		
-	# Rotate Ship
-	var ship_basis = Basis.IDENTITY;
-	var new_scale = ship_body.scale;
-	ship_basis = ship_basis.rotated(Vector3.UP, -relative_mouse.x * rotation_speed / 2.0);
-	ship_basis = ship_basis.rotated(Vector3.RIGHT, relative_mouse.y * rotation_speed);
-	ship_basis = ship_basis.rotated(ship_basis.z, relative_mouse.x * rotation_speed);
-	ship_basis = ship_basis.orthonormalized();
-	ship_body.basis = ship_basis;
-	ship_body.scale = new_scale;
+
+	 #Rotate Player
+	var player_basis = Basis.IDENTITY
+	player_basis = player_basis.rotated(Vector3.UP, -relative_mouse.x * rotation_speed / 2.0)
+	player_basis = player_basis.rotated(Vector3.RIGHT, relative_mouse.y * rotation_speed)
+	transform.basis = player_basis.orthonormalized()
 	
 	_move_forward(delta)
 			
